@@ -29,6 +29,7 @@ Custom pet manifests can include an `animation` object. The same object may also
       }
     },
     "chains": {
+      "idle": ["idle", "waving", "review"],
       "review": ["review", "waving"],
       "jumping": ["jumping", "waving"]
     },
@@ -72,20 +73,25 @@ If `frames` / `frameCount` is omitted, the renderer uses auto-detected row frame
 
 ## `chains`
 
-Chains define which sequences play before the idle loop. For example:
+Chains define the lead-in sequence for a state. For example:
 
 ```json
 {
   "chains": {
+    "idle": ["idle", "waving", "review"],
     "review": ["review", "waving"],
+    "running": ["running", "waving"],
     "failed": ["failed", "waiting"]
   }
 }
 ```
 
-The player appends idle after the configured chain and loops from the start of the chain while the state remains active.
+There are two playback modes:
 
-`idle` can also define a chain. When `chains.idle` is present, the idle state loops that configured chain instead of only looping the idle row. The player does not append an extra idle sequence to `chains.idle`; include `idle` in the array wherever you want the idle row to appear.
+- `chains.idle` applies only when the app state is actually `idle`. It loops from the start of the configured idle chain. The player does not append an extra idle sequence to `chains.idle`; include `idle` in the array wherever you want the idle row to appear.
+- Non-idle chains, such as `chains.running`, `chains.review`, or `chains.failed`, play once when that state starts. The player then appends the plain idle row and loops that idle row while the state remains active.
+
+This means `chains.idle` will not automatically run while Codex is busy. If the pet is in `running`, configure `chains.running`; if it is waiting for input, configure `chains.waiting`; and so on. To make an active-state lead-in last longer, repeat states in that state-specific chain.
 
 Default chains are:
 
@@ -96,7 +102,7 @@ waiting -> waving
 jumping -> waving
 ```
 
-If a state has no chain, it repeats its own sequence three times before idle.
+If a non-idle state has no chain, it repeats its own sequence three times before the idle-row fallback.
 
 ## `events`
 

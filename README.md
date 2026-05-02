@@ -59,7 +59,9 @@ The manifest remains simple:
       "review": { "row": 8, "frames": 6, "durationMs": 150 }
     },
     "chains": {
+      "idle": ["idle", "waving", "review"],
       "review": ["review", "waving"],
+      "running": ["running", "waving"],
       "jumping": ["jumping", "waving"]
     },
     "events": {
@@ -72,6 +74,8 @@ The manifest remains simple:
 `animation` can also be named `sequences`; the patcher passes either field through.
 
 If `autoDetectFrames` is not set to `false`, the renderer scans each row and uses the last non-transparent frame in that row. Explicit `frames` or `frameCount` values override detection.
+
+`chains.idle` loops only when the app state is actually idle. Active states such as `running`, `waiting`, `failed`, or `review` need their own chain entries. Non-idle chains play once, then fall back to the plain idle row while that state remains active.
 
 ## Files Patched
 
