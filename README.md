@@ -8,8 +8,6 @@ For clarity: the agent is the one writing all of this, not me.
 
 ## What This Mod Does
 
-This patches a copied Codex app package, not the normal installed app. The current test target is `H:\codex_app`.
-
 The mod changes the bundled pet player so custom pets can get more expressive behavior without changing the existing pet folder format:
 
 - Passes optional animation config through from `pet.json`.
@@ -77,7 +75,7 @@ If `autoDetectFrames` is not set to `false`, the renderer scans each row and use
 
 ## Files Patched
 
-Inside `H:\codex_app\app\resources\app.asar`:
+Inside `app\resources\app.asar`:
 
 ```text
 webview/assets/codex-avatar-BpKnWN_W.js
@@ -87,8 +85,8 @@ webview/assets/avatar-overlay-page-Dj9Zinq_.js
 Backups created by the first patch run:
 
 ```text
-H:\codex_app\app\resources\app.asar.backup-before-pet-patch
-H:\codex_app\app\resources\pet-patch-backups\
+app\resources\app.asar.backup-before-pet-patch
+app\resources\pet-patch-backups\
 ```
 
 ## Usage
@@ -96,7 +94,7 @@ H:\codex_app\app\resources\pet-patch-backups\
 Run from this repo:
 
 ```powershell
-node .\scripts\patch-codex-pet-behavior.js H:\codex_app\app\resources\app.asar
+node .\scripts\patch-codex-pet-behavior.js app\resources\app.asar
 ```
 
 The script accepts the path to the copied app's `app.asar`. It expects or creates the extracted directory beside the provided archive:
@@ -115,15 +113,17 @@ Integrity check failed for asar archive
 The patch script updates the copied `Codex.exe` metadata automatically. The first run creates backups:
 
 ```text
-H:\codex_app\app\Codex.exe.backup-before-pet-patch
-H:\codex_app\app\resources\app.asar.backup-before-pet-patch
-H:\codex_app\app\resources\pet-patch-backups\
+app\Codex.exe.backup-before-pet-patch
+app\resources\app.asar.backup-before-pet-patch
+app\resources\pet-patch-backups\
 ```
+
+Close the copied Codex app before running the patch. Windows locks `Codex.exe` while it is running, and the script must be able to update the embedded integrity metadata after repacking.
 
 Manual unpacking is still fine if you want to inspect the files yourself:
 
 ```powershell
-asar extract H:\codex_app\app\resources\app.asar H:\codex_app\app\resources\app.asar.extracted
+asar extract app\resources\app.asar app\resources\app.asar.extracted
 ```
 
 Then run the patch script.
@@ -133,8 +133,8 @@ Then run the patch script.
 To restore the original copied package:
 
 ```powershell
-Copy-Item H:\codex_app\app\resources\app.asar.backup-before-pet-patch H:\codex_app\app\resources\app.asar -Force
-Copy-Item H:\codex_app\app\Codex.exe.backup-before-pet-patch H:\codex_app\app\Codex.exe -Force
+Copy-Item app\resources\app.asar.backup-before-pet-patch app\resources\app.asar -Force
+Copy-Item app\Codex.exe.backup-before-pet-patch app\Codex.exe -Force
 ```
 
 ## Notes

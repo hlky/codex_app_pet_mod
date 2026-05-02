@@ -85,6 +85,8 @@ Chains define which sequences play before the idle loop. For example:
 
 The player appends idle after the configured chain and loops from the start of the chain while the state remains active.
 
+`idle` can also define a chain. When `chains.idle` is present, the idle state loops that configured chain instead of only looping the idle row. The player does not append an extra idle sequence to `chains.idle`; include `idle` in the array wherever you want the idle row to appear.
+
 Default chains are:
 
 ```text
