@@ -1,6 +1,7 @@
 const fs = require("node:fs");
 const path = require("node:path");
 const childProcess = require("node:child_process");
+const crypto = require("node:crypto");
 
 const [, , asarArg] = process.argv;
 
@@ -19,9 +20,12 @@ if (asarArg == null || asarArg === "--help" || asarArg === "-h") {
 
 const asarPath = path.resolve(asarArg);
 const resourcesDir = path.dirname(asarPath);
+const appRootDir = path.dirname(resourcesDir);
 const extractedDir = `${asarPath}.extracted`;
 const backupAsarPath = path.join(resourcesDir, "app.asar.backup-before-pet-patch");
+const backupExePath = path.join(appRootDir, "Codex.exe.backup-before-pet-patch");
 const chunkBackupDir = path.join(resourcesDir, "pet-patch-backups");
+const codexExePath = path.join(appRootDir, "Codex.exe");
 
 const workspaceFile = path.join(
   extractedDir,
@@ -204,6 +208,63 @@ function patchOverlay(file) {
   return writeIfChanged(file, source);
 }
 
+function readAsarHeaderBytes(file) {
+  const fd = fs.openSync(file, "r");
+  try {
+    const prefix = Buffer.alloc(16);
+    if (fs.readSync(fd, prefix, 0, prefix.length, 0) !== prefix.length) {
+      throw new Error(`Unable to read asar header prefix: ${file}`);
+    }
+    const headerSize = prefix.readUInt32LE(4);
+    const headerJsonSize = prefix.readUInt32LE(12);
+    if (headerJsonSize <= 0 || headerJsonSize > headerSize) {
+      throw new Error(`Unexpected asar header size in ${file}`);
+    }
+    const header = Buffer.alloc(headerJsonSize);
+    if (fs.readSync(fd, header, 0, header.length, 16) !== header.length) {
+      throw new Error(`Unable to read asar header JSON: ${file}`);
+    }
+    return header;
+  } finally {
+    fs.closeSync(fd);
+  }
+}
+
+function getAsarHeaderHash(file) {
+  return crypto.createHash("sha256").update(readAsarHeaderBytes(file)).digest("hex");
+}
+
+function patchExecutableAsarIntegrity(exeFile, nextHash) {
+  if (!fs.existsSync(exeFile)) {
+    console.warn(`Skipping executable integrity update; missing ${exeFile}`);
+    return false;
+  }
+
+  const marker = '"file":"resources\\\\app.asar","alg":"SHA256","value":"';
+  const exe = fs.readFileSync(exeFile);
+  const source = exe.toString("latin1");
+  const markerIndex = source.indexOf(marker);
+
+  if (markerIndex === -1) {
+    throw new Error(`Unable to find embedded app.asar integrity metadata in ${exeFile}`);
+  }
+
+  const hashStart = markerIndex + marker.length;
+  const previousHash = source.slice(hashStart, hashStart + 64);
+  if (!/^[0-9a-f]{64}$/i.test(previousHash)) {
+    throw new Error(`Unexpected embedded app.asar integrity value in ${exeFile}`);
+  }
+  if (previousHash.toLowerCase() === nextHash) {
+    return false;
+  }
+
+  copyIfMissing(exeFile, backupExePath);
+  Buffer.from(nextHash, "ascii").copy(exe, hashStart);
+  fs.writeFileSync(exeFile, exe);
+  console.log(`Updated Codex.exe app.asar integrity: ${previousHash} -> ${nextHash}`);
+  return true;
+}
+
 assertExists(asarPath);
 
 if (!fs.existsSync(extractedDir)) {
@@ -243,8 +304,13 @@ const changed =
 
 run("asar", ["pack", extractedDir, asarPath]);
 
+const integrityChanged = patchExecutableAsarIntegrity(
+  codexExePath,
+  getAsarHeaderHash(asarPath),
+);
+
 console.log(
-  changed
+  changed || integrityChanged
     ? "Patched and repacked copied Codex app pet behavior."
     : "Patch was already present; repacked copied Codex app.",
 );

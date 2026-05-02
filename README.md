@@ -91,7 +91,7 @@ H:\codex_app\app\resources\app.asar.backup-before-pet-patch
 H:\codex_app\app\resources\pet-patch-backups\
 ```
 
-## Apply The Patch
+## Usage
 
 Run from this repo:
 
@@ -99,11 +99,25 @@ Run from this repo:
 node .\scripts\patch-codex-pet-behavior.js H:\codex_app\app\resources\app.asar
 ```
 
-The script expects or creates the extracted directory beside the provided archive:
+The script accepts the path to the copied app's `app.asar`. It expects or creates the extracted directory beside the provided archive:
 
 ```text
 <path-to-app.asar>
 <path-to-app.asar>.extracted
+```
+
+After repacking `app.asar`, Electron's ASAR integrity metadata in `Codex.exe` must also match the new archive header hash. If it does not, the copied app exits before startup with an error like:
+
+```text
+Integrity check failed for asar archive
+```
+
+The patch script updates the copied `Codex.exe` metadata automatically. The first run creates backups:
+
+```text
+H:\codex_app\app\Codex.exe.backup-before-pet-patch
+H:\codex_app\app\resources\app.asar.backup-before-pet-patch
+H:\codex_app\app\resources\pet-patch-backups\
 ```
 
 Manual unpacking is still fine if you want to inspect the files yourself:
@@ -120,6 +134,7 @@ To restore the original copied package:
 
 ```powershell
 Copy-Item H:\codex_app\app\resources\app.asar.backup-before-pet-patch H:\codex_app\app\resources\app.asar -Force
+Copy-Item H:\codex_app\app\Codex.exe.backup-before-pet-patch H:\codex_app\app\Codex.exe -Force
 ```
 
 ## Notes
