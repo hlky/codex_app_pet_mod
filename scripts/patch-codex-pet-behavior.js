@@ -2,9 +2,24 @@ const fs = require("node:fs");
 const path = require("node:path");
 const childProcess = require("node:child_process");
 
-const resourcesDir = "H:\\codex_app\\app\\resources";
-const asarPath = path.join(resourcesDir, "app.asar");
-const extractedDir = path.join(resourcesDir, "app.asar.extracted");
+const [, , asarArg] = process.argv;
+
+if (asarArg == null || asarArg === "--help" || asarArg === "-h") {
+  console.error(
+    [
+      "Usage:",
+      "  node scripts/patch-codex-pet-behavior.js <path-to-app.asar>",
+      "",
+      "Example:",
+      "  node scripts/patch-codex-pet-behavior.js H:\\codex_app\\app\\resources\\app.asar",
+    ].join("\n"),
+  );
+  process.exit(asarArg == null ? 1 : 0);
+}
+
+const asarPath = path.resolve(asarArg);
+const resourcesDir = path.dirname(asarPath);
+const extractedDir = `${asarPath}.extracted`;
 const backupAsarPath = path.join(resourcesDir, "app.asar.backup-before-pet-patch");
 const chunkBackupDir = path.join(resourcesDir, "pet-patch-backups");
 
@@ -119,4 +134,3 @@ console.log(
     ? "Patched and repacked copied Codex app pet behavior."
     : "Patch was already present; repacked copied Codex app.",
 );
-

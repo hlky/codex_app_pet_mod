@@ -8,7 +8,7 @@ For clarity: the agent is the one writing all of this, not me.
 
 ## What This Mod Does
 
-This patches a copied Codex app package under `H:\codex_app`, not the normal installed app.
+This patches a copied Codex app package, not the normal installed app. The current test target is `H:\codex_app`.
 
 The mod changes the bundled pet player so custom pets can get more expressive behavior without changing the existing pet folder format:
 
@@ -75,14 +75,14 @@ H:\codex_app\app\resources\pet-patch-backups\
 Run from this repo:
 
 ```powershell
-node .\scripts\patch-codex-pet-behavior.js
+node .\scripts\patch-codex-pet-behavior.js H:\codex_app\app\resources\app.asar
 ```
 
-The script expects:
+The script expects the extracted directory beside the provided archive:
 
 ```text
-H:\codex_app\app\resources\app.asar
-H:\codex_app\app\resources\app.asar.extracted
+<path-to-app.asar>
+<path-to-app.asar>.extracted
 ```
 
 If `app.asar.extracted` is missing, unpack first:
@@ -104,4 +104,3 @@ Copy-Item H:\codex_app\app\resources\app.asar.backup-before-pet-patch H:\codex_a
 ## Notes
 
 The practical frame limit is still 8 frames per row. A true 9-frame sequence would require changing the atlas geometry, image dimensions, CSS background sizing, positioning math, and loader validation.
-
