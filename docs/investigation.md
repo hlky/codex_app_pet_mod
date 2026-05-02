@@ -64,7 +64,11 @@ waving: row 3, 4 frames
 waiting: row 6, 6 frames
 ```
 
-The mod extends `idle` and `jumping` to 8 frames and adds chain maps for several states.
+The mod extends `idle` and `jumping` to 8 frames, adds default chain maps for several states, and lets custom pets override sequence behavior from `pet.json`.
+
+The backend now passes raw `animation` or `sequences` config through from the manifest as `animationConfig`.
+
+The renderer now attempts to inspect the spritesheet with an in-browser canvas and count the last non-transparent cell in each row. That count is used unless a sequence explicitly sets `frames` or `frameCount`.
 
 ## Event Mapping
 
@@ -87,5 +91,4 @@ running-left: horizontal drag left
 running-right: horizontal drag right
 ```
 
-The `waving` state existed but was not clearly triggered. The mod adds vertical drag triggers so `waving` is reachable.
-
+The `waving` state existed but was not clearly triggered. The mod adds vertical drag triggers so `waving` is reachable, and lets custom pets override the hover event through `animation.events.hover`.

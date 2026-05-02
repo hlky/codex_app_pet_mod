@@ -12,6 +12,8 @@ This patches a copied Codex app package, not the normal installed app. The curre
 
 The mod changes the bundled pet player so custom pets can get more expressive behavior without changing the existing pet folder format:
 
+- Passes optional animation config through from `pet.json`.
+- Auto-detects the number of non-empty frames in each spritesheet row.
 - Extends `idle` to use all 8 available atlas columns.
 - Extends `jumping` to use all 8 available atlas columns.
 - Adds simple sequence chaining:
@@ -24,6 +26,7 @@ The mod changes the bundled pet player so custom pets can get more expressive be
   - drag left: `running-left`
   - drag up: `waving`
   - drag down: `jumping`
+- Makes hover configurable with `animation.events.hover`.
 
 ## Current App Constraints
 
@@ -48,11 +51,29 @@ The manifest remains simple:
 {
   "displayName": "Datachan",
   "description": "A custom Codex pet.",
-  "spritesheetPath": "spritesheet.webp"
+  "spritesheetPath": "spritesheet.webp",
+  "animation": {
+    "autoDetectFrames": true,
+    "idleSlowdown": 6,
+    "states": {
+      "idle": { "row": 0, "durationMs": 140, "lastFrameDurationMs": 320 },
+      "jumping": { "row": 4, "frames": 8, "durationMs": 110 },
+      "review": { "row": 8, "frames": 6, "durationMs": 150 }
+    },
+    "chains": {
+      "review": ["review", "waving"],
+      "jumping": ["jumping", "waving"]
+    },
+    "events": {
+      "hover": "waving"
+    }
+  }
 }
 ```
 
-This patch does not make `pet.json` data-driven yet. It patches the app's bundled JavaScript directly.
+`animation` can also be named `sequences`; the patcher passes either field through.
+
+If `autoDetectFrames` is not set to `false`, the renderer scans each row and uses the last non-transparent frame in that row. Explicit `frames` or `frameCount` values override detection.
 
 ## Files Patched
 
@@ -78,14 +99,14 @@ Run from this repo:
 node .\scripts\patch-codex-pet-behavior.js H:\codex_app\app\resources\app.asar
 ```
 
-The script expects the extracted directory beside the provided archive:
+The script expects or creates the extracted directory beside the provided archive:
 
 ```text
 <path-to-app.asar>
 <path-to-app.asar>.extracted
 ```
 
-If `app.asar.extracted` is missing, unpack first:
+Manual unpacking is still fine if you want to inspect the files yourself:
 
 ```powershell
 asar extract H:\codex_app\app\resources\app.asar H:\codex_app\app\resources\app.asar.extracted
@@ -103,4 +124,6 @@ Copy-Item H:\codex_app\app\resources\app.asar.backup-before-pet-patch H:\codex_a
 
 ## Notes
 
-The practical frame limit is still 8 frames per row. A true 9-frame sequence would require changing the atlas geometry, image dimensions, CSS background sizing, positioning math, and loader validation.
+The practical frame limit is still 8 frames per row. Auto-detection finds how many of those 8 cells are actually populated. A true 9-frame sequence would require changing the atlas geometry, image dimensions, CSS background sizing, positioning math, and loader validation.
+
+See [docs/configuration.md](docs/configuration.md) for the supported animation config.
