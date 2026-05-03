@@ -31,7 +31,11 @@ Custom pet manifests can include an `animation` object. The same object may also
     "chains": {
       "idle": ["idle", "waving", "review"],
       "review": ["review", "waving"],
-      "jumping": ["jumping", "waving"]
+      "jumping": ["jumping", "waving"],
+      "running": {
+        "mode": "loop",
+        "sequence": ["running", "waving"]
+      }
     },
     "events": {
       "hover": "waving"
@@ -67,6 +71,8 @@ durationMs           Per-frame duration.
 frameDurationMs      Alias for durationMs.
 lastFrameDurationMs  Duration for the final frame.
 slowdown             Multiplies frame durations for that state.
+chainMode            Optional playback mode for that state.
+chainPlayback        Alias for chainMode.
 ```
 
 If `frames` / `frameCount` is omitted, the renderer uses auto-detected row frame counts when available, then falls back to the built-in default for that state.
@@ -80,18 +86,43 @@ Chains define the lead-in sequence for a state. For example:
   "chains": {
     "idle": ["idle", "waving", "review"],
     "review": ["review", "waving"],
-    "running": ["running", "waving"],
+    "running": {
+      "mode": "loop",
+      "sequence": ["running", "waving"]
+    },
     "failed": ["failed", "waiting"]
   }
 }
 ```
 
-There are two playback modes:
+Chain entries can be either an array or an object with a playback mode:
 
-- `chains.idle` applies only when the app state is actually `idle`. It loops from the start of the configured idle chain. The player does not append an extra idle sequence to `chains.idle`; include `idle` in the array wherever you want the idle row to appear.
-- Non-idle chains, such as `chains.running`, `chains.review`, or `chains.failed`, play once when that state starts. The player then appends the plain idle row and loops that idle row while the state remains active.
+```json
+{
+  "chains": {
+    "running": {
+      "mode": "loop",
+      "sequence": ["running", "waving", "running-left", "running-right"]
+    }
+  }
+}
+```
 
-This means `chains.idle` will not automatically run while Codex is busy. If the pet is in `running`, configure `chains.running`; if it is waiting for input, configure `chains.waiting`; and so on. To make an active-state lead-in last longer, repeat states in that state-specific chain.
+Supported playback modes:
+
+```text
+idleFallback  Default. Play the active chain once, then loop the configured idle chain.
+loop          Loop the active chain until the app state changes.
+once          Play the active chain once and hold the final frame.
+```
+
+`mode` can be set on a chain object, on a state as `chainMode` / `chainPlayback`, or globally as `animation.chainMode` / `animation.chainPlayback`. The legacy boolean `loopActiveChains: true` also maps to `loop`.
+
+`chains.idle` applies only when the app state is actually `idle`. It loops from the start of the configured idle chain. The player does not append an extra idle sequence to `chains.idle`; include `idle` in the array wherever you want the idle row to appear.
+
+Non-idle chains, such as `chains.running`, `chains.review`, or `chains.failed`, default to `idleFallback`: the active chain plays once, then the player loops `chains.idle` if configured, otherwise the plain idle row. Use `loop` for states that should keep cycling their active chain while Codex remains in that state.
+
+If the pet is in `running`, configure `chains.running`; if it is waiting for input, configure `chains.waiting`; and so on. In `idleFallback` mode, the active-state chain is still the lead-in, and the configured idle chain is only the loop that follows it.
 
 Default chains are:
 

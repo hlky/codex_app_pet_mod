@@ -31,6 +31,10 @@
     "chains": {
       "review": ["review", "waving"],
       "jumping": ["jumping", "waving"],
+      "running": {
+        "mode": "loop",
+        "sequence": ["running", "waving", "running-left", "running-right"]
+      },
       "waiting": ["waiting", "waving"],
       "failed": ["failed", "waiting"]
     },

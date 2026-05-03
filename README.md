@@ -6,6 +6,14 @@ So I set the agent upon improving itself, which is obviously a slippery slope.
 
 For clarity: the agent is the one writing all of this, not me.
 
+## Demo
+
+Demo video:
+
+[assets/oVRedOdhq0.mp4](assets/oVRedOdhq0.mp4)
+
+The demo uses the bundled Datachan Extended pet in [assets/datachan-extended](assets/datachan-extended). It is a normal Codex custom pet folder plus an `animation` config that exercises longer row playback, custom timing, idle/running chains, and a hover override.
+
 ## What This Mod Does
 
 The mod changes the bundled pet player so custom pets can get more expressive behavior without changing the existing pet folder format:
@@ -19,6 +27,10 @@ The mod changes the bundled pet player so custom pets can get more expressive be
   - `failed -> waiting -> idle`
   - `waiting -> waving -> idle`
   - `jumping -> waving -> idle`
+- Adds configurable chain playback modes:
+  - `idleFallback`: play the active chain once, then loop the configured idle chain
+  - `loop`: loop the active chain until the app state changes
+  - `once`: play the active chain once and hold the final frame
 - Adds more transient drag events:
   - drag right: `running-right`
   - drag left: `running-left`
@@ -43,6 +55,13 @@ Custom pets are loaded from:
 %USERPROFILE%\.codex\pets\<pet-name>\pet.json
 ```
 
+To install the included Datachan Extended example:
+
+```powershell
+New-Item -ItemType Directory -Force "$env:USERPROFILE\.codex\pets" | Out-Null
+Copy-Item .\assets\datachan-extended "$env:USERPROFILE\.codex\pets\datachan-extended" -Recurse -Force
+```
+
 The manifest remains simple:
 
 ```json
@@ -61,7 +80,10 @@ The manifest remains simple:
     "chains": {
       "idle": ["idle", "waving", "review"],
       "review": ["review", "waving"],
-      "running": ["running", "waving"],
+      "running": {
+        "mode": "loop",
+        "sequence": ["running", "waving"]
+      },
       "jumping": ["jumping", "waving"]
     },
     "events": {
@@ -75,7 +97,7 @@ The manifest remains simple:
 
 If `autoDetectFrames` is not set to `false`, the renderer scans each row and uses the last non-transparent frame in that row. Explicit `frames` or `frameCount` values override detection.
 
-`chains.idle` loops only when the app state is actually idle. Active states such as `running`, `waiting`, `failed`, or `review` need their own chain entries. Non-idle chains play once, then fall back to the plain idle row while that state remains active.
+`chains.idle` loops when the app state is actually idle. Active states such as `running`, `waiting`, `failed`, or `review` need their own chain entries. Non-idle chains default to `idleFallback`, which plays the active chain once and then loops `chains.idle` if configured, otherwise the plain idle row. Set a chain entry to `{ "mode": "loop", "sequence": [...] }` to loop that chain until the app state changes.
 
 ## Files Patched
 
@@ -146,3 +168,5 @@ Copy-Item app\Codex.exe.backup-before-pet-patch app\Codex.exe -Force
 The practical frame limit is still 8 frames per row. Auto-detection finds how many of those 8 cells are actually populated. A true 9-frame sequence would require changing the atlas geometry, image dimensions, CSS background sizing, positioning math, and loader validation.
 
 See [docs/configuration.md](docs/configuration.md) for the supported animation config.
+
+There is also an upstream issue draft in [docs/upstream-issue.md](docs/upstream-issue.md).

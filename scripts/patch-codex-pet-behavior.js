@@ -147,7 +147,15 @@ function patchCodexAvatar(file) {
     source,
     "function F(e){",
     "function L(e,t,n,r){",
-    "function F(e){let{avatarRef:t,isAnimationEnabled:n,prefersReducedMotion:r,state:i,animationConfig:a,detectedFrameCounts:o}=e,s=n===void 0?!0:n,c=i===void 0?`idle`:i;(0,d.useEffect)(()=>{let e=t.current;if(e==null)return;let n=I(c,r||!s,a,o),i=n.frames,p=0,l=null;if(i.length===0)return;if(e.style.backgroundPosition=R(i[p]),i.length===1)return;let u=()=>{l=window.setTimeout(()=>{let t=p+1;if(t>=i.length){if(n.loopStartIndex!=null){p=n.loopStartIndex,e.style.backgroundPosition=R(i[p]),u();return}l=null;return}p=t,e.style.backgroundPosition=R(i[p]),u()},i[p].frameDurationMs)};return u(),()=>{l!=null&&window.clearTimeout(l)}},[t,s,r,c,a,o])}function I(e,t,n,r){let i=Y(e,n,r);if(t)return{frames:[i[0]??P[e]?.[0]??P.idle[0]],loopStartIndex:null};let a=X(e,n);if(e===`idle`){let e=a?a.flatMap(e=>$(Y(e,n,r),n,e)):$(i,n,`idle`);return{frames:e,loopStartIndex:0}}let o=a?a.flatMap(e=>$(Y(e,n,r),n,e)):[...i,...i,...i],s=Y(`idle`,n,r),c=o.length;return{frames:[...o,...$(s,n,`idle`)],loopStartIndex:c}}function X(e,t){let n=t?.chains?.[e]??{review:[`review`,`waving`],failed:[`failed`,`waiting`],waiting:[`waiting`,`waving`],jumping:[`jumping`,`waving`]}[e];return Array.isArray(n)&&n.length>0?n:null}function Y(e,t,n){let r=t?.states?.[e],i=P[e]??P.idle,a=r?.rowIndex??r?.row??i[0]?.rowIndex??0,o=Number.isFinite(r?.frames)?r.frames:Number.isFinite(r?.frameCount)?r.frameCount:n?.[a]??i.length,s=Math.max(1,Math.min(k,Math.trunc(o))),c=Number.isFinite(r?.durationMs)?r.durationMs:Number.isFinite(r?.frameDurationMs)?r.frameDurationMs:i[0]?.frameDurationMs??140,l=Number.isFinite(r?.lastFrameDurationMs)?r.lastFrameDurationMs:i.at(-1)?.frameDurationMs??c;return L(a,s,c,l)}function $(e,t,n){let r=t?.states?.[n],i=Number.isFinite(r?.slowdown)?r.slowdown:n===`idle`?t?.idleSlowdown??j:1;return i===1?e:e.map(e=>({...e,frameDurationMs:e.frameDurationMs*i}))}",
+    [
+      "function F(e){let{avatarRef:t,isAnimationEnabled:n,prefersReducedMotion:r,state:i,animationConfig:a,detectedFrameCounts:o}=e,s=n===void 0?!0:n,c=i===void 0?`idle`:i;(0,d.useEffect)(()=>{let e=t.current;if(e==null)return;let n=I(c,r||!s,a,o),i=n.frames,p=0,l=null;if(i.length===0)return;if(e.style.backgroundPosition=R(i[p]),i.length===1)return;let u=()=>{l=window.setTimeout(()=>{let t=p+1;if(t>=i.length){if(n.loopStartIndex!=null){p=n.loopStartIndex,e.style.backgroundPosition=R(i[p]),u();return}l=null;return}p=t,e.style.backgroundPosition=R(i[p]),u()},i[p].frameDurationMs)};return u(),()=>{l!=null&&window.clearTimeout(l)}},[t,s,r,c,a,o])}",
+      "function I(e,t,n,r){let i=Y(e,n,r);if(t)return{frames:[i[0]??P[e]?.[0]??P.idle[0]],loopStartIndex:null};let a=X(e,n);if(e===`idle`){let e=W(a,n,r);return{frames:e,loopStartIndex:0}}let o=a?a.flatMap(e=>$(Y(e,n,r),n,e)):[...i,...i,...i],s=G(e,n);if(s===`loop`)return{frames:o,loopStartIndex:0};if(s===`once`)return{frames:o,loopStartIndex:null};let c=W(X(`idle`,n),n,r),l=o.length;return{frames:[...o,...c],loopStartIndex:l}}",
+      "function X(e,t){let n=t?.chains?.[e]??{review:[`review`,`waving`],failed:[`failed`,`waiting`],waiting:[`waiting`,`waving`],jumping:[`jumping`,`waving`]}[e];if(n&&Array.isArray(n.sequence))n=n.sequence;return Array.isArray(n)&&n.length>0?n:null}",
+      "function G(e,t){let n=t?.chains?.[e]?.mode??t?.states?.[e]?.chainMode??t?.states?.[e]?.chainPlayback??t?.chainMode??t?.chainPlayback??t?.loopActiveChains;if(n===!0)return`loop`;if(n===!1)return`idleFallback`;return n===`loop`?`loop`:n===`once`?`once`:`idleFallback`}",
+      "function W(e,t,n){return e?e.flatMap(e=>$(Y(e,t,n),t,e)):$(Y(`idle`,t,n),t,`idle`)}",
+      "function Y(e,t,n){let r=t?.states?.[e],i=P[e]??P.idle,a=r?.rowIndex??r?.row??i[0]?.rowIndex??0,o=Number.isFinite(r?.frames)?r.frames:Number.isFinite(r?.frameCount)?r.frameCount:n?.[a]??i.length,s=Math.max(1,Math.min(k,Math.trunc(o))),c=Number.isFinite(r?.durationMs)?r.durationMs:Number.isFinite(r?.frameDurationMs)?r.frameDurationMs:i[0]?.frameDurationMs??140,l=Number.isFinite(r?.lastFrameDurationMs)?r.lastFrameDurationMs:i.at(-1)?.frameDurationMs??c;return L(a,s,c,l)}",
+      "function $(e,t,n){let r=t?.states?.[n],i=Number.isFinite(r?.slowdown)?r.slowdown:n===`idle`?t?.idleSlowdown??j:1;return i===1?e:e.map(e=>({...e,frameDurationMs:e.frameDurationMs*i}))}",
+    ].join(""),
   );
 
   source = replaceBetween(
@@ -236,26 +244,6 @@ function readAsarHeaderBytes(file) {
 
 function getAsarHeaderHash(file) {
   return crypto.createHash("sha256").update(readAsarHeaderBytes(file)).digest("hex");
-}
-
-function getEmbeddedAsarIntegrityHash(exeFile) {
-  if (!fs.existsSync(exeFile)) {
-    return null;
-  }
-
-  const marker = '"file":"resources\\\\app.asar","alg":"SHA256","value":"';
-  const source = fs.readFileSync(exeFile).toString("latin1");
-  const markerIndex = source.indexOf(marker);
-  if (markerIndex === -1) {
-    throw new Error(`Unable to find embedded app.asar integrity metadata in ${exeFile}`);
-  }
-
-  const hashStart = markerIndex + marker.length;
-  const hash = source.slice(hashStart, hashStart + 64);
-  if (!/^[0-9a-f]{64}$/i.test(hash)) {
-    throw new Error(`Unexpected embedded app.asar integrity value in ${exeFile}`);
-  }
-  return hash.toLowerCase();
 }
 
 function canWriteFile(file) {
@@ -351,9 +339,7 @@ const changed =
   patchCodexAvatar(avatarFile) |
   patchOverlay(overlayFile);
 
-const currentAsarHash = getAsarHeaderHash(asarPath);
-const embeddedAsarHash = getEmbeddedAsarIntegrityHash(codexExePath);
-if ((changed || embeddedAsarHash !== currentAsarHash) && fs.existsSync(codexExePath)) {
+if (fs.existsSync(codexExePath)) {
   assertCanUpdateExecutableIntegrity(codexExePath);
 }
 
