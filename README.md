@@ -20,8 +20,8 @@ The mod changes the bundled pet player so custom pets can get more expressive be
 
 - Passes optional animation config through from `pet.json`.
 - Auto-detects the number of non-empty frames in each spritesheet row.
-- Extends `idle` to use all 8 available atlas columns.
-- Extends `jumping` to use all 8 available atlas columns.
+- Lets any configured state use up to all 8 atlas columns, either from auto-detected row content or explicit `frames` / `frameCount`.
+- Widens the built-in `idle` and `jumping` defaults so those rows are no longer capped at their original hardcoded frame counts.
 - Adds simple sequence chaining:
   - `review -> waving -> idle`
   - `failed -> waiting -> idle`
@@ -97,6 +97,8 @@ The manifest remains simple:
 
 If `autoDetectFrames` is not set to `false`, the renderer scans each row and uses the last non-transparent frame in that row. Explicit `frames` or `frameCount` values override detection.
 
+The per-state config applies to every pet state, not only `idle` and `jumping`. Each state is still capped by the current Codex atlas geometry: 8 columns per row.
+
 `chains.idle` loops when the app state is actually idle. Active states such as `running`, `waiting`, `failed`, or `review` need their own chain entries. Non-idle chains default to `idleFallback`, which plays the active chain once and then loops `chains.idle` if configured, otherwise the plain idle row. Set a chain entry to `{ "mode": "loop", "sequence": [...] }` to loop that chain until the app state changes.
 
 ## Files Patched
@@ -165,7 +167,7 @@ Copy-Item app\Codex.exe.backup-before-pet-patch app\Codex.exe -Force
 
 ## Notes
 
-The practical frame limit is still 8 frames per row. Auto-detection finds how many of those 8 cells are actually populated. A true 9-frame sequence would require changing the atlas geometry, image dimensions, CSS background sizing, positioning math, and loader validation.
+The practical frame limit is still 8 frames per row for every state. Auto-detection finds how many of those 8 cells are actually populated. A true 9-frame sequence would require changing the atlas geometry, image dimensions, CSS background sizing, positioning math, and loader validation.
 
 See [docs/configuration.md](docs/configuration.md) for the supported animation config.
 
