@@ -31,7 +31,7 @@ const workspaceFile = path.join(
   extractedDir,
   ".vite",
   "build",
-  "workspace-root-drop-handler-B4gQVO2J.js",
+  "workspace-root-drop-handler-Dv8hBDDM.js",
 );
 const avatarFile = path.join(
   extractedDir,

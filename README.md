@@ -172,3 +172,7 @@ The practical frame limit is still 8 frames per row for every state. Auto-detect
 See [docs/configuration.md](docs/configuration.md) for the supported animation config.
 
 There is also an upstream issue draft in [docs/upstream-issue.md](docs/upstream-issue.md).
+
+## Current version
+
+26.429.61741
