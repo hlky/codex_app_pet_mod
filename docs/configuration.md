@@ -38,7 +38,11 @@ Custom pet manifests can include an `animation` object. The same object may also
       }
     },
     "events": {
-      "hover": "waving"
+      "hover": "waving",
+      "dragLeft": "running-left",
+      "dragRight": "running-right",
+      "dragUp": "waving",
+      "dragDown": "jumping"
     }
   }
 }
@@ -58,6 +62,26 @@ failed
 waiting
 running
 review
+```
+
+The advanced overlay patch also emits richer activity states. These are optional; if a pet does not configure them, the renderer falls back to the built-in row for the matching base status or idle:
+
+```text
+thinking
+editing
+edited
+running-command
+ran-command
+reading
+read
+listing
+listed
+searching
+searched
+searching-web
+searched-web
+calling-tool
+called-tool
 ```
 
 Each state supports:
@@ -140,10 +164,14 @@ If a non-idle state has no chain, it repeats its own sequence three times before
 Currently supported:
 
 ```text
-hover  State used while the pointer hovers over the pet.
+hover      State used while the pointer hovers over the pet.
+dragLeft   State used while dragging left.
+dragRight  State used while dragging right.
+dragUp     State used while dragging up.
+dragDown   State used while dragging down.
 ```
 
-Drag events are patched globally:
+Default drag events are:
 
 ```text
 drag left   running-left

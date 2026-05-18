@@ -16,7 +16,9 @@ The demo uses the bundled Datachan Extended pet in [assets/datachan-extended](as
 
 ## What This Mod Does
 
-The mod changes the bundled pet player so custom pets can get more expressive behavior without changing the existing pet folder format:
+The repo now owns an Advanced Pet System as TypeScript source code in [src/advanced-pet-system.ts](src/advanced-pet-system.ts). The patch script is the installer that adapts the compiled system into the current Codex desktop bundle.
+
+The system gives custom pets more expressive behavior without changing the existing pet folder format:
 
 - Passes optional animation config through from `pet.json`.
 - Auto-detects the number of non-empty frames in each spritesheet row.
@@ -31,12 +33,21 @@ The mod changes the bundled pet player so custom pets can get more expressive be
   - `idleFallback`: play the active chain once, then loop the configured idle chain
   - `loop`: loop the active chain until the app state changes
   - `once`: play the active chain once and hold the final frame
+- Adds activity-aware pet states for local Codex work:
+  - `thinking`
+  - `editing` / `edited`
+  - `running-command` / `ran-command`
+  - `reading` / `read`
+  - `listing` / `listed`
+  - `searching` / `searched`
+  - `searching-web` / `searched-web`
+  - `calling-tool` / `called-tool`
 - Adds more transient drag events:
   - drag right: `running-right`
   - drag left: `running-left`
   - drag up: `waving`
   - drag down: `jumping`
-- Makes hover configurable with `animation.events.hover`.
+- Makes hover and drag directions configurable with `animation.events`.
 
 ## Current App Constraints
 
@@ -87,7 +98,11 @@ The manifest remains simple:
       "jumping": ["jumping", "waving"]
     },
     "events": {
-      "hover": "waving"
+      "hover": "waving",
+      "dragLeft": "running-left",
+      "dragRight": "running-right",
+      "dragUp": "waving",
+      "dragDown": "jumping"
     }
   }
 }
@@ -106,8 +121,21 @@ The per-state config applies to every pet state, not only `idle` and `jumping`. 
 Inside `app\resources\app.asar`:
 
 ```text
-webview/assets/codex-avatar-BpKnWN_W.js
-webview/assets/avatar-overlay-page-Dj9Zinq_.js
+.vite/build/workspace-root-drop-handler-*.js
+webview/assets/codex-avatar-*.js
+webview/assets/avatar-overlay-page-*.js
+```
+
+The patcher discovers these generated chunks by content, so it is not tied to one specific Vite hash.
+
+## Source Layout
+
+```text
+src/advanced-pet-system.ts       The standalone animation, event, and activity-state engine.
+test/advanced-pet-system.test.ts Focused TypeScript tests for the standalone engine.
+dist/                            Generated CommonJS output used by the installer.
+scripts/patch-codex-pet-behavior.js
+                                  Installer that patches the Codex bundle to call equivalent runtime behavior.
 ```
 
 Backups created by the first patch run:
@@ -122,8 +150,12 @@ app\resources\pet-patch-backups\
 Run from this repo:
 
 ```powershell
+npm install
+npm test
 node .\scripts\patch-codex-pet-behavior.js app\resources\app.asar
 ```
+
+The patch script builds `dist/` from TypeScript when needed.
 
 The script accepts the path to the copied app's `app.asar`. It expects or creates the extracted directory beside the provided archive:
 

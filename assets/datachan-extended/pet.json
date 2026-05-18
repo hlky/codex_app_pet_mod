@@ -47,6 +47,81 @@
         "durationMs": 120,
         "lastFrameDurationMs": 220
       },
+      "thinking": {
+        "row": 8,
+        "durationMs": 150,
+        "lastFrameDurationMs": 280
+      },
+      "editing": {
+        "row": 7,
+        "durationMs": 120,
+        "lastFrameDurationMs": 220
+      },
+      "edited": {
+        "row": 0,
+        "durationMs": 140,
+        "lastFrameDurationMs": 320
+      },
+      "running-command": {
+        "row": 7,
+        "durationMs": 120,
+        "lastFrameDurationMs": 220
+      },
+      "ran-command": {
+        "row": 0,
+        "durationMs": 140,
+        "lastFrameDurationMs": 320
+      },
+      "reading": {
+        "row": 6,
+        "durationMs": 150,
+        "lastFrameDurationMs": 260
+      },
+      "read": {
+        "row": 0,
+        "durationMs": 140,
+        "lastFrameDurationMs": 320
+      },
+      "listing": {
+        "row": 6,
+        "durationMs": 150,
+        "lastFrameDurationMs": 260
+      },
+      "listed": {
+        "row": 0,
+        "durationMs": 140,
+        "lastFrameDurationMs": 320
+      },
+      "searching": {
+        "row": 6,
+        "durationMs": 150,
+        "lastFrameDurationMs": 260
+      },
+      "searched": {
+        "row": 0,
+        "durationMs": 140,
+        "lastFrameDurationMs": 320
+      },
+      "searching-web": {
+        "row": 6,
+        "durationMs": 150,
+        "lastFrameDurationMs": 260
+      },
+      "searched-web": {
+        "row": 0,
+        "durationMs": 140,
+        "lastFrameDurationMs": 320
+      },
+      "calling-tool": {
+        "row": 7,
+        "durationMs": 120,
+        "lastFrameDurationMs": 220
+      },
+      "called-tool": {
+        "row": 0,
+        "durationMs": 140,
+        "lastFrameDurationMs": 320
+      },
       "idle": {
         "row": 8,
         "durationMs": 150,
@@ -89,7 +164,11 @@
       }
     },
     "events": {
-      "hover": "jumping"
+      "hover": "jumping",
+      "dragLeft": "running-left",
+      "dragRight": "running-right",
+      "dragUp": "waving",
+      "dragDown": "jumping"
     }
   }
 }
